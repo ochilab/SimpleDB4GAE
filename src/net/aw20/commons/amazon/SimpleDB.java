@@ -1,4 +1,13 @@
 /*
+ * SimpleDB for Google Appengine
+ * changed and released by ochilab 2012/7/4
+ * http://www.ochi-lab.org
+ * 
+ * Change note
+ *  -add charset=utf-8 to "Content-type"
+ *  -need the Base64.class(improved) 
+ * The following header comment  is an original
+ * ------------------------------------------------------------------------------
  * Public Domain License
  * 
  * Maintained and released by aw2.0 Ltd 
@@ -16,6 +25,9 @@
  *   - Support for non-Amazon Simple Implementations
  *   - Improved Error handling
  *   - Support for HTTP-POST for sending large packets
+ *
+ *  ------------------------------------------------------------------------------------
+ * 
  */
 package net.aw20.commons.amazon;
 
@@ -593,7 +605,10 @@ public class SimpleDB extends Object {
 			if ( it.hasNext() )
 				sb.append( "&" );
 		}
-
+		
+		System.out.println(":"+sb.toString()+":");
+		//byte[] hs = hmacSha1(sb.toString());
+		
 		return Base64.encodeBytes( hmacSha1( sb.toString() ) );
 	}
 	
@@ -663,7 +678,8 @@ public class SimpleDB extends Object {
 		urlc.setUseCaches(false);
 		urlc.setAllowUserInteraction(false);
 		urlc.setRequestProperty("Host", endPoint.getHost() );
-		urlc.setRequestProperty("Content-type", "application/x-www-form-urlencoded" );
+		//urlc.setRequestProperty("Content-type", "application/x-www-form-urlencoded" );
+		urlc.setRequestProperty("Content-type", "application/x-www-form-urlencoded; charset=utf-8" );
 		
 		/* Send out the data */
 		OutputStream out = urlc.getOutputStream();

@@ -1,4 +1,19 @@
 /**
+  * Base64 for Google AppEngine
+ *  changed and released by ochilab 2012/7/4
+ *  http://www.ochi-lab.org
+ * 
+ *  We cannot use java.io.FileOutputStream on GAE.
+ *  So, we changed this code in the following locations.
+ * 
+ * Change note
+ *  -import org.koherent.io.appengine.DatastoreInputStream;
+ *  -import org.koherent.io.appengine.DatastoreOutputStream;
+ *  -use DatastoreOutputStream instead of java.io.FileOutputStream
+ *  -use DatastoreIutputStream instead of java.io.FileIutputStream
+ *   
+ * The following header comment  is an original
+ * ----------------------------------------------------------------------------------
  * <p>Encodes and decodes to and from Base64 notation.</p>
  * <p>Homepage: <a href="http://iharder.net/base64">http://iharder.net/base64</a>.</p>
  * 
@@ -40,6 +55,9 @@
  * @version 2.3.3
  */
 package net.aw20.commons.amazon;
+
+import org.koherent.io.appengine.DatastoreInputStream;
+import org.koherent.io.appengine.DatastoreOutputStream;
 
 public class Base64 extends Object {
     
@@ -1300,8 +1318,10 @@ public class Base64 extends Object {
         
         Base64.OutputStream bos = null;
         try {
+            //bos = new Base64.OutputStream( 
+            //      new java.io.FileOutputStream( filename ), Base64.ENCODE );
             bos = new Base64.OutputStream( 
-                  new java.io.FileOutputStream( filename ), Base64.ENCODE );
+                    new DatastoreOutputStream( filename ), Base64.ENCODE );
             bos.write( dataToEncode );
         }   // end try
         catch( java.io.IOException e ) {
@@ -1332,8 +1352,10 @@ public class Base64 extends Object {
         
         Base64.OutputStream bos = null;
         try{
-            bos = new Base64.OutputStream( 
-                      new java.io.FileOutputStream( filename ), Base64.DECODE );
+            //bos = new Base64.OutputStream( 
+            //          new java.io.FileOutputStream( filename ), Base64.DECODE );
+        	bos = new Base64.OutputStream( 
+                     new DatastoreOutputStream( filename ), Base64.DECODE );
             bos.write( dataToDecode.getBytes( PREFERRED_ENCODING ) );
         }   // end try
         catch( java.io.IOException e ) {
@@ -1383,9 +1405,11 @@ public class Base64 extends Object {
             buffer = new byte[ (int)file.length() ];
             
             // Open a stream
+            //bis = new Base64.InputStream( 
+            //          new java.io.BufferedInputStream( 
+            //          new java.io.FileInputStream( file ) ), Base64.DECODE );
             bis = new Base64.InputStream( 
-                      new java.io.BufferedInputStream( 
-                      new java.io.FileInputStream( file ) ), Base64.DECODE );
+                    new DatastoreInputStream( filename) , Base64.DECODE );
             
             // Read until done
             while( ( numBytes = bis.read( buffer, length, 4096 ) ) >= 0 ) {
@@ -1437,10 +1461,11 @@ public class Base64 extends Object {
             int numBytes = 0;
             
             // Open a stream
+           // bis = new Base64.InputStream( 
+           //           new java.io.BufferedInputStream( 
+           //           new java.io.FileInputStream( file ) ), Base64.ENCODE );
             bis = new Base64.InputStream( 
-                      new java.io.BufferedInputStream( 
-                      new java.io.FileInputStream( file ) ), Base64.ENCODE );
-            
+                    new DatastoreInputStream( filename) , Base64.DECODE );
             // Read until done
             while( ( numBytes = bis.read( buffer, length, 4096 ) ) >= 0 ) {
                 length += numBytes;
@@ -1474,8 +1499,9 @@ public class Base64 extends Object {
         String encoded = Base64.encodeFromFile( infile );
         java.io.OutputStream out = null;
         try{
-            out = new java.io.BufferedOutputStream(
-                  new java.io.FileOutputStream( outfile ) );
+         //   out = new java.io.BufferedOutputStream(
+         //         new java.io.FileOutputStream( outfile ) );
+            out = new DatastoreOutputStream( outfile);
             out.write( encoded.getBytes("US-ASCII") ); // Strict, 7-bit output.
         }   // end try
         catch( java.io.IOException e ) {
@@ -1502,8 +1528,9 @@ public class Base64 extends Object {
         byte[] decoded = Base64.decodeFromFile( infile );
         java.io.OutputStream out = null;
         try{
-            out = new java.io.BufferedOutputStream(
-                  new java.io.FileOutputStream( outfile ) );
+            //out = new java.io.BufferedOutputStream(
+            //      new java.io.FileOutputStream( outfile ) );
+            out = new DatastoreOutputStream( outfile );
             out.write( decoded );
         }   // end try
         catch( java.io.IOException e ) {
